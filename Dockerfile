@@ -6,32 +6,34 @@ ENV PYTHONUNBUFFERED=1
 # Set up the working directory
 WORKDIR /
 
+# Base packages
 RUN apt-get update --yes --quiet && DEBIAN_FRONTEND=noninteractive apt-get install --yes --quiet --no-install-recommends \
     software-properties-common \
     gpg-agent \
-    build-essential apt-utils \
+    build-essential \
+    apt-utils \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get install --reinstall ca-certificates
-
-# PYTHON 3.10
-RUN add-apt-repository --yes ppa:deadsnakes/ppa && apt update --yes --quiet
-
-RUN DEBIAN_FRONTEND=noninteractive apt-get install --yes --quiet --no-install-recommends \
+# Add deadsnakes and install Python 3.11
+RUN add-apt-repository --yes ppa:deadsnakes/ppa && apt-get update --yes --quiet && \
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes --quiet --no-install-recommends \
     python3.11 \
     python3.11-dev \
     python3.11-distutils \
     python3.11-lib2to3 \
     python3.11-gdbm \
     python3.11-tk \
-    pip
+    python3-pip
 
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 999 \
-    && update-alternatives --config python3 && ln -s /usr/bin/python3 /usr/bin/python
+# Set Python 3.11 as default
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 && \
+    ln -sf /usr/bin/python3 /usr/bin/python
 
+# Upgrade pip
 RUN pip install --upgrade pip
 
-# Add your file
+# Add your files
 ADD . .
 
 RUN pip install runpod
