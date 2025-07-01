@@ -39,4 +39,4 @@ RUN pip install runpod
 # Override Ollama's entrypoint
 ENTRYPOINT ["bin/bash", "start.sh"]
 
-CMD ["mistral"]
+CMD ["gemma3n:e4b"]
